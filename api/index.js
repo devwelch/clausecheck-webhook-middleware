@@ -1,13 +1,13 @@
 export default async function handler(req, res) {
-  // Allow your website domain
+  // Allow only your web domain (replace with your actual domain)
   res.setHeader('Access-Control-Allow-Origin', 'https://www.clausecheck.shop');
-  // Allow these methods
+  // Allow methods needed for the request and preflight
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  // Allow these headers
+  // Allow content-type header
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Handle OPTIONS preflight request
   if (req.method === 'OPTIONS') {
-    // Respond OK to preflight requests
     return res.status(200).end();
   }
 
