@@ -1,13 +1,23 @@
 export default async function handler(req, res) {
+  // ✅ Handle CORS preflight requests
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.clausecheck.shop');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    // CORS preflight request — respond with 200 and stop here
+    return res.status(200).end();
+  }
+
+  // ✅ Handle non-POST methods
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
   try {
-    // Read JSON body from client
     const body = req.body;
 
-    // Forward it to Make.com webhook URL
+    // ✅ Send contract to Make.com webhook
     const makeRes = await fetch('https://hook.us2.make.com/1zir3ycxj2ki7m7x8edmixxv5q9cfl29', {
       method: 'POST',
       headers: {
@@ -16,13 +26,9 @@ export default async function handler(req, res) {
       body: JSON.stringify(body),
     });
 
-    // Read text response from Make.com
     const text = await makeRes.text();
 
-    // Allow any origin to access (for CORS)
-    res.setHeader('Access-Control-Allow-Origin', '*');
-
-    // Send text back to frontend
+    // ✅ Send result back to frontend
     res.status(200).send(text);
   } catch (error) {
     console.error(error);
