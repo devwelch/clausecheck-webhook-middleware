@@ -12,11 +12,21 @@ export default async function handler(req, res) {
       },
     });
 
-    const text = await makeRes.text();
+    // Try to parse the response as JSON
+    const contentType = makeRes.headers.get('content-type') || '';
+    let responseData;
+
+    if (contentType.includes('application/json')) {
+      responseData = await makeRes.json(); // If Make returns JSON
+    } else {
+      const text = await makeRes.text(); // If Make returns plain text
+      responseData = { result: text };   // Wrap it in a JSON object
+    }
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.status(200).send(text);
+    res.status(200).json(responseData); // ✅ Return JSON properly
   } catch (error) {
+    console.error('Error:', error);
     res.status(500).json({ error: 'Failed to contact Make.com' });
   }
 }
