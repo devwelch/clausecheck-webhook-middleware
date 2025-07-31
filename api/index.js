@@ -12,11 +12,18 @@ export default async function handler(req, res) {
       },
     });
 
+    if (!makeRes.ok) {
+      const errorText = await makeRes.text();
+      console.error('Make.com response error:', makeRes.status, errorText);
+      return res.status(makeRes.status).json({ error: errorText });
+    }
+
     const json = await makeRes.json();
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.status(200).json(json);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to contact Make.com' });
+    console.error('Fetch error:', error);
+    res.status(500).json({ error: 'Failed to contact Make.com', details: error.message });
   }
 }
